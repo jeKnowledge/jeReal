@@ -20,8 +20,8 @@ def home(request):
     feed = {
         'feed': posts
     }
-    return render(request, 'API/home.html', feed)
+    return render(request, 'jeReal/home.html', feed)
 
 def makepost(request):
-    return render(request, 'API/post.html', {'title': 'Post'} )
+    return render(request, 'jeReal/post.html', {'title': 'Post'} )
 

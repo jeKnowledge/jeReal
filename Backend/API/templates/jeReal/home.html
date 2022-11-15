@@ -1,0 +1,8 @@
+{% extends "jeReal/base.html" %}
+{% block conteudo %}
+    {% for post in feed %}
+        <h1>{{ post.foto }}</h1>
+        <p>By {{ post.autor }}, {{ post.data }}</p>
+        <p>{{ post.comentário }}</p> 
+    {% endfor %}
+{% endblock conteudo %}

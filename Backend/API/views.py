@@ -7,22 +7,20 @@ from django.contrib.auth import authenticate
 #from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework import status
-from rest_framework.response import Response
-from API.serializers import ProfileSerializer, PostSerializer
+from django.http import JsonResponse
+from .serializers import ProfileSerializer, PostSerializer, UserSerializer
 from .models import Profile, Post
-from itertools import chain
+
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from rest_framework.decorators import api_view
-#------------------------------------
-'''
-from datetime import datetime
-from urllib import urlencode
-from django.conf import settings
-'''
+import jwt
+import datetime
+import json
+
 from django.contrib import messages
-from API.models import User
+from .models import User
 # Create your views here.
 CLIENT_ID ='549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com'
 
@@ -150,45 +148,59 @@ def login(request):
 # body -> username, password, email
 # -------Login and Register view with Google-----~
 @api_view(['POST'])
-def login_register(request):
+def login_register_google(request):
 
-    #validate the header Authorization and if it´s not valid throw an error
-    if 'Authorization' not in request.headers:
-        return Response(status=status.HTTP_401_UNAUTHORIZED, data={'message':'No Authorization token given in Headers!'})
-    
-    token = request.headers['Authorization']
+    body = json.loads(request.body)
+
+    token = str(body['token'])
 
     try:
-        # verify the token inside google
         idinfo = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
-        userID = idinfo['sub']
+        print(idinfo)
 
-        # check if the user already exists, if it does, log him in
-        user = User.objects.get(username=userID) 
-        if user is not None:
-            auth.authenticate(username=userID, email=user.email, password=user.password) 
-            return Response(status=status.HTTP_200_OK, data={'message':'User logged in successfully!'})
+        userid = idinfo['email']
+        
+        if userid is None:
+            return JsonResponse({'message': 'Invalid Google Token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        userid = userid.lower().strip()
+
+        if User.objects.filter(email=userid).exists():
+            user = User.objects.get(email=userid)
+            serializer = UserSerializer(user)
+            print(serializer.data)
+
+            # create token for user to login
+            token = jwt.encode({
+                'id': serializer.data['username'] + serializer.data['email'],
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=365)
+            }, 'secret', algorithm='HS256')
+            return JsonResponse({"key": str(token), "user": serializer.data}, status=status.HTTP_200_OK)
         else:
-            # register and login the user
-            username = request.data['username']
-            email = request.data['email']
-            password = request.data['password']
+            body['email'] = body['email'].lower().strip()
 
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user.save()
+            domain = body['email'].split('@')[1]
+            if domain != 'jeknowledge.com':
+                return JsonResponse({'message': 'Invalid email domain'}, status=status.HTTP_400_BAD_REQUEST)
+            
+             # check if the email already exists
+            if User.objects.filter(email=body['email']).exists():
+                return JsonResponse({'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-            user_login = auth.authenticate(username=username, password=password)
-            auth.login(request, user_login)
+            serializer = UserSerializer(data=body)
+            if serializer.is_valid():
+                serializer.save()
+                token = jwt.encode({
+                    'id': serializer.data['username'] + serializer.data['email'],
+                    'exp': datetime.datetime.utcnow() + datetime.timedelta(days=365)
+                }, 'secret', algorithm='HS256')
+                return JsonResponse({"key": str(token)}, status=status.HTTP_200_OK)
+            return JsonResponse({serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-            user_model = User.objects.get(username=username)
-            new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
-            new_profile.save()
-            return
-
-    except ValueError:
-        return Response(status=status.HTTP_401_UNAUTHORIZED, data={'message': 'Invalid Authorization token given in Headers!'})
+    except ValueError as e:
+        print(e)
+        return JsonResponse({'message': 'Invalid Google Token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-                
 
     

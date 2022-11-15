@@ -1,52 +1,97 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native'
-import React, { useEffect, useState } from "react";
+import React, { useReducer, useEffect, useState } from "react";
 import * as Google from "expo-auth-session/providers/google";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
+import useAuthDispatch from '../../Components/AuthContextDispatch';
+import AsyncStorageLib from "@react-native-async-storage/async-storage";
 
 
-/*
 const initialState = {
   email : '',
   password : '',
 };
 
-const reducer = (user, action) => {
-  switch (action.type){
-    case 'change':{
-      const { name, value } = action;
-      return {...user, [name]: value};
-    }
-    case 'closedauth':{
-      return{
-        ...user,
-        error: 'Google Auth Fechada!'
-      };
-    }<
-    case 'error':{
-      return{
-        ...user,
-      };
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "change": {
+      const { key, value } = action;
+      return { ...state, [key]: value };
     }
     default:
-      return {...state};
+      return { ...state };
   }
 };
-*/
 
 
-const LoginScreen = () => {
-  const [accessToken, setAccessToken] = useState(null);
+const LoginScreen = ({navigation}) => {
+  const { login } = useAuthDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [email, password] = state;
   const [user, setUser] = useState(null);
+
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    clientId: "549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com",
-    // iosClientId: "",
-    // androidClientId: "",
-  });
+    expoClientId:'549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com',
+    androidClientId:'',
+    iosClientId:'',
+  })
+
+  const handleGoogleSignup = async () => {
+    promptAsync();
+  };
+
+  const fetchGoogleLogin = async () => {
+    const { id_token } = response.params;
+    try {
+      // Dúvida -> este fetch é o request para a API?
+      const response = await fetch('http://localhost:8000/login_register_google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token: id_token
+          })
+      })
+      if(!response){
+        return;
+      }
+      console.log("response", response);
+
+      const data = await response.json();
+      console.log("Google OAuth Final Token", data);
+      if(response.status !== 200){
+        setError(true);
+        return;
+      }
+      
+      const { key, user} = data;
+
+      const token = key.slice(2, key.length -1);
+
+      await AsyncStorageLib.setItem('token', token);
+      await AsyncStorageLib.setItem('user', JSON.stringify(user));
+      login(user);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
+    if (response?.type === "success") {
+      fetchGoogleLogin();
+    }
+  }, [response]);
+
+/*
+  useEffect(() => {
+    console.log(response);
+    //rconsole.log(response.params);
     if(response?.type === "success"){
-      setAccessToken(response.authentication.accessToken);
+      setAccessToken(response.params.id_token);
+      console.log(accessToken);
       accessToken && fetchUserInfo();
     }
   },[response, accessToken]);
@@ -57,6 +102,13 @@ const LoginScreen = () => {
     });
     response.json().then((data) => {
       setUser(data);
+
+      // post to database
+      // and then useAuthDispatch() to login
+      // login(token);
+      login(accessToken);
+
+
     });
   }
 
@@ -138,21 +190,7 @@ const LoginScreen = () => {
         })
       }
     }
-  
-
-  useEffect(() => {
-    window.google.accounts.id.initialize({
-      client_id: '549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com',
-      callback: handleCallbackResponse,
-    })
-
-    window.google.accounts.id.renderButton(
-      document.getElementById('signInView'),
-      { theme: 'outline', size: 'large', shape: 'circle', logo_alignment: 'center' },
-    )
-  }, [users])
 */
-
 
   return (
     <SafeAreaView style={styles.page}>
@@ -170,9 +208,7 @@ const LoginScreen = () => {
           <View name='button_container' style={styles.button}>
             <TouchableOpacity
               disabled={!request}
-              onPress={() => {
-                promptAsync({showInRecents: true});
-              }}
+              onPress={handleGoogleSignup} 
               style={styles.button}
             >
               <Image source={require('../../assets/google_button.png')} style={{width: 300, height: 40}} />

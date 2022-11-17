@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AuthDispatchContext } from "../";
+import { AuthDispatchContext } from "expo/AppEntry";
 
 const useAuthDispatch = () => {
   const dispatch = React.useContext(AuthDispatchContext);

@@ -3,7 +3,7 @@ import React, { useReducer, useEffect, useState } from "react";
 import * as Google from "expo-auth-session/providers/google";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
-import useAuthDispatch from '../../Components/AuthContextDispatch';
+import useAuthDispatch from '../../Components/AuthContext/hooks/useAuthContextDispatch';
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 
 
@@ -85,112 +85,6 @@ const LoginScreen = ({navigation}) => {
     }
   }, [response]);
 
-/*
-  useEffect(() => {
-    console.log(response);
-    //rconsole.log(response.params);
-    if(response?.type === "success"){
-      setAccessToken(response.params.id_token);
-      console.log(accessToken);
-      accessToken && fetchUserInfo();
-    }
-  },[response, accessToken]);
-
-  async function fetchUserInfo(){
-    let response = await fetch("https://www.googleapis.com/userinfo/v2/me", {
-      headers:{Authorization: `Bearer ${accessToken}`}
-    });
-    response.json().then((data) => {
-      setUser(data);
-
-      // post to database
-      // and then useAuthDispatch() to login
-      // login(token);
-      login(accessToken);
-
-
-    });
-  }
-
-  const ShowUserInfo = () => {
-    if(user){
-      return(
-        <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
-          <Text style={{fontSize: 35, fontWeight: 'bold', marginBottom:20}}>Bem vindo</Text>
-          <Image source={{uri: user.picture}} style={{width: 100, height: 100, borderRadius: 50}}/>
-          <Text style={{fontSize: 20, fontWeight: 'bold'}}>{user.name}</Text>
-        </View>
-      )
-    }
-  }
-
-  /*
-  const authcontext = React.useContext(AuthContext);
-
-  const {users, setUsers} = React.useState([]);
-  const navigate = useNavigation();
-
-  useEffect(() => {
-    fetchData(setUsers)
-  }, []);
-
-
-  const LogIn = (authToken, userObject) => {
-    AsyncStorageLib.setItem('Authorization', authToken);
-    AsyncStorageLib.setItem('User', JSON.stringify(userObject));
-    authcontext.dispatch({type: 'LOGIN'});
-    navigate('settings/')
-  };
-
-  const handleCallbackResponse = (response) =>{
-    let exists = false;
-    const authToken = response.credential
-    let userObject = jwt_decode(authToken);
-
-    if(!exists){
-      console.log(userObject)
-      axios.post('http://localhost:8000/login', {
-        'username' : userObject.name,
-        'email' : userObject.email,
-        'password' : userObject.password,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-      ).then((response) => {
-        console.log(response)
-        if(response.statusText === 'Created'){
-          LogIn(authToken, userObject)
-      }else{
-        console.log(response.data)
-      }
-    }).catch((error) => {
-      console.error(error.response)
-      })
-    }else{
-      axios.put('http://localhost:8000/settings', {
-        'description' : userObject.description,
-        'image' : userObject.picture,
-      },
-        {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        }
-      ).then((response) => {
-        console.log(response)
-        
-        if(response.statusText === 'OK'){
-          LogIn(authToken, userObject)
-          }else{
-            console.log(response.data)
-          }
-        })
-      }
-    }
-*/
 
   return (
     <SafeAreaView style={styles.page}>

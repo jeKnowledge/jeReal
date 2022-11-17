@@ -1,26 +1,22 @@
 #from audioop import reverse
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
-from django.contrib.auth.models import User, auth
-
-from django.contrib.auth import authenticate
-#from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from rest_framework import status
-from django.http import JsonResponse
-from .serializers import ProfileSerializer, PostSerializer, UserSerializer
-from .models import Profile, Post
-
-
-from google.oauth2 import id_token
-from google.auth.transport import requests
-from rest_framework.decorators import api_view
-import jwt
 import datetime
 import json
 
+import jwt
 from django.contrib import messages
-from .models import User
+from django.contrib.auth import authenticate
+#from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, auth
+from django.http import HttpResponse, JsonResponse
+from google.auth.transport import requests
+from google.oauth2 import id_token
+from rest_framework import status
+from rest_framework.decorators import api_view
+
+from .models import Post, Profile, User
+from .serializers import PostSerializer, ProfileSerializer, UserSerializer
+
 # Create your views here.
 CLIENT_ID ='549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com'
 
@@ -39,9 +35,9 @@ def profile(request, pk):
 
             profile_serializer.save()
             posts_serializer.save()
-            return Response(profile_serializer.data + posts_serializer.data)
+            return JsonResponse(profile_serializer.data + posts_serializer.data)
         else:
-            return HttpResponse('<h1>Serializer data is invalid</h1>')
+            return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
 @login_required(login_url='login/')
 def settings(request):
@@ -200,7 +196,3 @@ def login_register_google(request):
     except ValueError as e:
         print(e)
         return JsonResponse({'message': 'Invalid Google Token'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-    

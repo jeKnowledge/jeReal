@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const ProfileScreen = () => {
+const Post = () => {
   return (
     <View>
-      <Text>ProfileScreen</Text>
+      <Text>Post</Text>
     </View>
   )
 }
 
-export default ProfileScreen
+export default Post
 
 const styles = StyleSheet.create({})

@@ -1,7 +1,5 @@
 import React, { useReducer, useEffect, createContext } from "react";
-import axios from "axios";
-import LoginScreen from "../Screens/LoginScreen";
-import { AsyncStorageLib } from "@react-native-async-storage/async-storage";
+import { getTokenFromStorage } from "./hooks/functions";
 
 let AuthDispatchContext = createContext(undefined);
 AuthDispatchContext.displayName = "AuthDispatchContext";
@@ -69,13 +67,6 @@ const AuthContextProvider = ({ children }) => {
   );
 };
 
-export const storeToken = async (token) => {
-  await AsyncStorageLib.setItem("token", token);
-};
 
-export const getTokenFromStorage = async () => {
-  const token = await AsyncStorageLib.getItem("token");
-  return token;
-};
 
 export { AuthContextProvider, AuthDispatchContext, AuthStateContext };

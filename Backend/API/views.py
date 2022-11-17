@@ -14,8 +14,8 @@ from google.oauth2 import id_token
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Post, Profile, User
-from .serializers import PostSerializer, ProfileSerializer, UserSerializer
+from .models import Post, Profile, User, NewUser
+from .serializers import PostSerializer, ProfileSerializer, NewUserSerializer
 
 # Create your views here.
 CLIENT_ID ='549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com'
@@ -24,7 +24,7 @@ CLIENT_ID ='549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent
 @api_view(['GET'])
 def profile(request, pk):
     if request.method == 'GET':
-        user = User.objects.get(username=pk)
+        user = NewUser.objects.get(username=pk)
         profile = Profile.objects.get(user=user)
         posts = Post.objects.filter(user=pk)
     
@@ -161,9 +161,9 @@ def login_register_google(request):
 
         userid = userid.lower().strip()
 
-        if User.objects.filter(email=userid).exists():
-            user = User.objects.get(email=userid)
-            serializer = UserSerializer(user)
+        if NewUser.objects.filter(email=userid).exists():
+            user = NewUser.objects.get(email=userid)
+            serializer = NewUserSerializer(user)
             print(serializer.data)
 
             # create token for user to login
@@ -183,7 +183,7 @@ def login_register_google(request):
             if User.objects.filter(email=body['email']).exists():
                 return JsonResponse({'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = UserSerializer(data=body)
+            serializer = NewUserSerializer(data=body)
             if serializer.is_valid():
                 serializer.save()
                 token = jwt.encode({

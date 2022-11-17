@@ -1,13 +1,14 @@
 from rest_framework import serializers
-from .models import User, Profile, Post
+from .models import NewUser, Profile, Post
 
-class UserSerializer(serializers.ModelSerializer):
+class NewUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('username', 'email', 'password')
+        model = NewUser
+        fields = ('id_token', 'username', 'email', 'password')
 
         def create(self, validated_data):
-            user = User(
+            user = NewUser(
+                id_token = validated_data['id_token'],
                 username=validated_data['username'],
                 email=validated_data['email'],
                 password=validated_data['password']

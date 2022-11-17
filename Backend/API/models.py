@@ -7,7 +7,7 @@ from django.utils import timezone
 # Create your models here.
 
 
-User = get_user_model()
+#User = get_user_model()
 
 class NewUser(models.Model):
     id_token = models.CharField(max_length=150, primary_key=True, unique=True)
@@ -18,7 +18,7 @@ class NewUser(models.Model):
 
 
 class Profile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
     id_user = models.IntegerField()
     description = models.TextField(blank = True)
     profileImg = models.ImageField(upload_to='profileImg', blank = True, null = True, default = None)
@@ -26,7 +26,7 @@ class Profile(models.Model):
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.CharField(max_length=100)
+    user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='postImg')
     description = models.TextField(max_length = 500, blank = True)
     time = models.DateTimeField(default=timezone.now)

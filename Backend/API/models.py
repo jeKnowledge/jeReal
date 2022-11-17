@@ -29,4 +29,5 @@ class Post(models.Model):
     user = models.CharField(max_length=100)
     image = models.ImageField(upload_to='postImg')
     description = models.TextField(max_length = 500, blank = True)
+    time = models.DateTimeField(default=timezone.now)
 

@@ -7,6 +7,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import useAuthState  from "./Components/AuthContext/hooks/useAuthContextState"; 
 import React, {useReducer, useEffect, useContext} from 'react';
+import Post from './Components/Post/Post';
 
 const {Navigator, Screen} = createNativeStackNavigator();
 
@@ -37,8 +38,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Navigator screenOptions={{headerShown: false}}>
-            <Screen name="Profile" component={ProfileScreen} />
-            <Screen name="Settings" component={SettingsScreen} />
+            <Screen name="Post" component={Post} />
       </Navigator>
     </NavigationContainer>
   );

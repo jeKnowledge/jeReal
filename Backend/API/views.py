@@ -14,13 +14,13 @@ from google.oauth2 import id_token
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Post, Profile, User, NewUser
-from .serializers import PostSerializer, ProfileSerializer, NewUserSerializer
+from .models import Post, Profile, User, NewUser, Comment
+from .serializers import PostSerializer, ProfileSerializer, NewUserSerializer, CommentSerializer
 
 # Create your views here.
 CLIENT_ID ='549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com'
 
-@login_required(login_url='login')
+@login_required(login_url='login/')
 @api_view(['GET'])
 def profile(request, pk):
     if request.method == 'GET':
@@ -38,6 +38,19 @@ def profile(request, pk):
             return JsonResponse(profile_serializer.data + posts_serializer.data)
         else:
             return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@login_required(login_url='login/')
+def get_comments(request, pk):
+    if request.method == 'GET':
+        comments = Comment.objects.filter(postID=pk)
+        serializer = CommentSerializer(comments, many=True)
+
+        if serializer.is_valid():
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @login_required(login_url='login/')
 def settings(request):
@@ -80,6 +93,7 @@ def settings(request):
 
     return HttpResponse(status=status.HTTP_201_CREATED, data={'message':'Profile updated successfully!'})
 
+# =============================================
 def register(request):
 
     if request.method == 'POST':
@@ -139,7 +153,7 @@ def login(request):
             return HttpResponse('<h1>Invalid credentials</h1>')
     else:
         return HttpResponse('<h1>Method not allowed</h1>')
-
+# =============================================
 
 # body -> username, password, email
 # -------Login and Register view with Google-----~
@@ -161,6 +175,7 @@ def login_register_google(request):
 
         userid = userid.lower().strip()
 
+        # if user already exists
         if NewUser.objects.filter(email=userid).exists():
             user = NewUser.objects.get(email=userid)
             serializer = NewUserSerializer(user)
@@ -172,6 +187,8 @@ def login_register_google(request):
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=365)
             }, 'secret', algorithm='HS256')
             return JsonResponse({"key": str(token), "user": serializer.data}, status=status.HTTP_200_OK)
+
+        # if user doesn't exist yet
         else:
             body['email'] = body['email'].lower().strip()
 

@@ -1,27 +1,14 @@
 from django.shortcuts import render
 from .models import Post
-
-posts = [
-    {
-        'autor': 'João Santos',
-        'foto': 'Teste de foto',
-        'comentário': 'Grande paisagem',
-        'data': '2d ago'
-    },
-    {
-        'autor': 'Carlos Alberto',
-        'foto': 'Teste de foto 2',
-        'comentário': 'Bonita flor',
-        'data': '3d ago'
-    }
-]
+from django.http import JsonResponse
+from rest_framework import status
+from .serializers import PostSerializer
 
 def home(request):
-    feed = {
-        'feed': posts
-    }
-    return render(request, 'jeReal/home.html', feed)
+    posts = Post.objects.all()
+    serializer = PostSerializer(posts)
+    return JsonResponse(serializer)
 
 def makepost(request):
-    return render(request, 'jeReal/post.html', {'title': 'Post'} )
+    return JsonResponse({'title': 'Post'})
 

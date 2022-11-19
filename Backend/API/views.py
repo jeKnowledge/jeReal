@@ -51,6 +51,15 @@ def get_comments(request, pk):
         else:
             return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
+@login_required(login_url='login/')
+@api_view(['POST'])
+def send_comment(request):
+    serializer = CommentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
 @login_required(login_url='login/')
 def settings(request):

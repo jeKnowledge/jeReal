@@ -24,17 +24,16 @@ class Profile(models.Model):
     profileImg = models.ImageField(upload_to='profileImg', blank = True, null = True, default = None)
     date_joined = models.DateTimeField(default=timezone.now)
 
-class Comment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    userID = models.ForeignKey(NewUser, on_delete=models.CASCADE)
-    postID = models.ForeignKey(Post, on_delete=models.CASCADE)
-    comment = models.TextField(max_length = 500, blank = False)
-
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='postImg')
     description = models.TextField(max_length = 500, blank = True)
     time = models.DateTimeField(default=timezone.now)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    
+class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    userID = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    postID = models.ForeignKey(Post, on_delete=models.CASCADE)
+    comment = models.TextField(max_length = 500, blank = False)
 

@@ -1,11 +1,14 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View , Image, SafeAreaView} from 'react-native'
+import { Button, StyleSheet, Text, TouchableOpacity, View , Image, SafeAreaView, ScrollView} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { NavigationContainerRefContext } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native';
 
-const ProfileScreen = () => {
 
+const ProfileScreen = (props) => {
+  const navigation = useNavigation();
+  /*
   const [ posts, setPosts] = useState([])
   const [ profileInfo, setProfileInfo] = useState([])
   const username = AsyncStorageLib.getItem('user')
@@ -22,6 +25,55 @@ const ProfileScreen = () => {
       })
   }, [])
 
+*/
+  const posts = [
+      {
+        "id": 1,
+        "user": "user1",
+        "description": "Description 1",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+      {
+        "id": 2,
+        "description": "Description 2",
+        "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
+      },
+    ];
 
   return (
     <SafeAreaView style={styles.page}>
@@ -44,9 +96,23 @@ const ProfileScreen = () => {
       <View>
         <Text style={styles.bioText}>This is the user's description {/*profileInfo.description*/}</Text>
       </View>
-      <View name='posts_container' style={styles.posts_container}>
+      <View name='container' style={styles.container}>
         <Text style={styles.text}>Your Memories</Text>
       </View>
+      <ScrollView>
+        <View name='posts_container' style={styles.posts_container}>
+          {posts.map((post) => (
+            <TouchableOpacity key={post.id} style={styles.posts_container} onPress={() => navigation.navigate('Post', {
+              username: post.user,
+              postID : post.id, 
+              postImage : post.image,
+              postDescription : post.description,
+            })}>
+              <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -108,7 +174,7 @@ const styles = StyleSheet.create({
   profileImg_container:{
     alignItems: 'center',
   },
-  posts_container:{
+  container:{
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -119,5 +185,17 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginLeft: 20,
     marginTop: 20,
+  },
+  posts_container:{
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 5,
+  },
+  postImg:{
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+    margin: 5,
   },
 })

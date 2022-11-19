@@ -14,4 +14,5 @@ urlpatterns = [
     path( 'profile/<str:pk>/', views.profile, name='profile'),
     path( 'get_comments/<int:pk>/', views.get_comments, name='get_comments'),
     path( 'settings/', views.settings, name='settings'),
+    path( 'send_comment/', views.send_comment, name='send_comment'),
 ]

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User as AuthUser
 import uuid
 from datetime import datetime
 from django.utils import timezone
+from django.urls import reverse
 # Create your models here.
 
 
@@ -30,6 +31,10 @@ class Post(models.Model):
     image = models.ImageField(upload_to='postImg')
     description = models.TextField(max_length = 500, blank = True)
     time = models.DateTimeField(default=timezone.now)
+
+#Função que abre o post depois de criado
+    def get_absolute_url(self):
+        return reverse('post-detail', kwargs={'pk':self.pk})
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

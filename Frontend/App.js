@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import LoginScreen from './Screens/LoginScreen';
 import SignupScreen from './Screens/SignupScreen';
 import ProfileScreen from './Screens/ProfileScreen/ProfileScreen';
-import SettingsScreen from './Screens/SettingsScreen';
+import SettingsScreen from './Screens/SettingsScreen/SettingsScreen';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import useAuthState  from "./Components/AuthContext/hooks/useAuthContextState"; 
@@ -40,6 +40,7 @@ export default function App() {
       <Navigator screenOptions={{headerShown: false}}>
           <Screen name="Profile" component={ProfileScreen} />
           <Screen name="Post" component={Post} />
+          <Screen name="SettingsScreen" component={SettingsScreen} />
       </Navigator>
     </NavigationContainer>
   );

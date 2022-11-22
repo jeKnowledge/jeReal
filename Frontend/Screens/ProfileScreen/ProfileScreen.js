@@ -85,7 +85,7 @@ const ProfileScreen = (props) => {
         </TouchableOpacity>
         <Text style={styles.text}>Profile</Text>
 
-        <TouchableOpacity style={styles.edit_profile_button}>
+        <TouchableOpacity style={styles.edit_profile_button} onPress={() => navigation.navigate('SettingsScreen')}>
           <Text style={styles.button_text}>Settings</Text>
         </TouchableOpacity>
       </View>

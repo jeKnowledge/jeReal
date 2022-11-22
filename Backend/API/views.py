@@ -11,17 +11,18 @@ def home(request):
     return JsonResponse(serializer)
 
 def post(request):
-    detail_post = Post.objects.pk
+    detail_post = Post.objects.filter(id=pk)
     serializer = PostSerializer(detail_post)
     return JsonResponse(serializer)
 
-def delete(request):
-    delete_post = Post.objects.pk
-    serializer = DeletePostSerializer(delete_post)
-    return JsonResponse(serializer)
-
 def makepost(request):
-    posts = Post.objects.all()
-    serializer = NewPostSerializer(posts)
-    return JsonResponse(serializer)
+    if request.method == 'POST':
 
+        id = request.POST.get('id')
+        user = request.POST.get('user')
+        image = request.POST.get('image')
+        description = request.POST.get('description')
+        time = request.POST.get('time')
+
+        post = Post.objects.create_post(id=id, user=user, image=image, description=description, time=time)
+        post.save()

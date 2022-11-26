@@ -35,7 +35,19 @@ def profile(request, pk):
 
             profile_serializer.save()
             posts_serializer.save()
-            return JsonResponse(profile_serializer.data + posts_serializer.data)
+
+            return JsonResponse({'profile': profile_serializer.data, 'posts': posts_serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+
+# view to get all info about a post
+@api_view(['GET'])
+def get_post(request, pk):
+    if request.method == 'GET':
+        post = Post.objects.get(id=pk)
+        post_serializer = PostSerializer(post, many=False)
+        if post_serializer.is_valid():
+            return JsonResponse(post_serializer.data, status=status.HTTP_200_OK)
         else:
             return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -62,12 +74,12 @@ def send_comment(request):
         return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
 @login_required(login_url='login/')
-def settings(request):
+def settings(request, pk):
     print(request.user)
-    user_profile = Profile.objects.get(user=request.user)
+    user_profile = Profile.objects.get(user=pk)
 
     if request.method == 'POST':
-        if request.FILES.get('image') == None:
+        if request.FILES.get('avatar') == None:
             profileImg = user_profile.profileImg
             description = request.POST.get('description')
 
@@ -75,22 +87,22 @@ def settings(request):
             user_profile.description = description
             user_profile.save()
 
-        if request.FILES.get('image') != None:
-            profileImg = request.FILES['image']
+        if request.FILES.get('avatar') != None:
+            profileImg = request.FILES['avatar']
             description = request.POST.get('description')
 
             user_profile.profileImg = profileImg
             user_profile.description = description
             user_profile.save()
         
-        return HttpResponse('<h1>Profile completed!</h1>')
+        return JsonResponse({'message': 'Profile updated'}, status=status.HTTP_200_OK)
     
     elif request.method == 'PUT':
 
-        if request.FILES.get('image') == None:
+        if request.FILES.get('avatar') == None:
             profileImg = user_profile.profileImg
         else: 
-            profileImg = request.FILES['image']
+            profileImg = request.FILES['avatar']
 
         description = request.POST.get('description')
 
@@ -100,7 +112,7 @@ def settings(request):
         user_profile.description = description
         user_profile.save()
 
-    return HttpResponse(status=status.HTTP_201_CREATED, data={'message':'Profile updated successfully!'})
+    return JsonResponse({'message':'Profile updated successfully!'}, status=status.HTTP_200_OK)
 
 # =============================================
 def register(request):

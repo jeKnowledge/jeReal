@@ -38,7 +38,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Navigator screenOptions={{headerShown: false}}>
-          <Screen name="Profile" component={ProfileScreen} />
+          <Screen name="ProfileScreen" component={ProfileScreen} />
           <Screen name="Post" component={Post} />
           <Screen name="SettingsScreen" component={SettingsScreen} />
       </Navigator>

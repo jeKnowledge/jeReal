@@ -18,6 +18,8 @@ const SettingsScreen = () => {
     errorMessage: null
   }
 
+  const [description, setDescription] = React.useState('');
+
   handlePickAvatar = async () => {
     UserPermissions.getCameraPermission();
 
@@ -31,19 +33,33 @@ const SettingsScreen = () => {
       this.setState({ user: { ...this.state.user, avatar: result.uri } });
     }
   };
+
   handleSubmitSettings = async () => {
     const { username, email, password, avatar } = this.state.user;
 
-    axios
-      .get('http://localhost:8000/profile/${id}/settings')
-      .then((response) => {
-        setProfileInfo(response.data[0])
-        setPosts(response.data[1])
+    try {
+      const response = await fetch('http://localhost:3000/settings/${username}/', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          description: description,
+          avatar: avatar
+        })
       })
-      .catch((error) => {
-        console.log(error)
-      })
+      const data = await response.json();
+      console.log(data);
+      if (data.status === 200) {
+        this.props.navigation.navigate('ProfileScreen');
+      } else {
+        alert('Something went wrong');
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+
   const Separator = () => {
     return <View style={styles.separator} />
   };
@@ -65,11 +81,17 @@ const SettingsScreen = () => {
       </View>
       <View style={styles.body}>
         <Text style={styles.descriptionText}>Description</Text>
-        <TextInput style={styles.description} placeholder='Update your description'/>
+        <TextInput style={styles.description}
+          placeholder='Update your description'
+          onChangeText={newDescription => setDescription(newDescription)}
+          defaultValue={description}/>
       </View>
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => handleSubmitSettings()}>
           <Image style={styles.submitButton} source={require('../../assets/submit.png')}/>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => handleLogout()}>
+          <Text style={styles.textButton}>Logout</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -154,8 +176,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   submitButton: {
     height: 100,
@@ -163,5 +185,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     resizeMode: 'contain',
     marginTop: 30,
+  },
+  logoutButton: {
+    height: 50,
+    width: 100,
+    borderRadius: 10,
+    marginTop: 30,
+    color: 'black',
+    backgroundColor: 'white',
+  },
+  textButton: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 10,
   },
 })

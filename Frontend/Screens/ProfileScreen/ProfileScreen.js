@@ -8,24 +8,42 @@ import { useNavigation } from '@react-navigation/native';
 
 const ProfileScreen = (props) => {
   const navigation = useNavigation();
-  /*
+  
   const [ posts, setPosts] = useState([])
   const [ profileInfo, setProfileInfo] = useState([])
-  const username = AsyncStorageLib.getItem('user')
+  
+  
+ // recebe o username do perfil que está a ser visitado através das props
+  const username = props.username;
+
 
   useEffect(() => {
     axios
       .get('http://localhost:8000/profile/${username}')
       .then((response) => {
-        setProfileInfo(response.data[0])
-        setPosts(response.data[1])
+        console.log(response.data)
+        setPosts(response.data.posts)
+        setProfileInfo(response.data.profile)
       })
       .catch((error) => {
         console.log(error)
       })
   }, [])
 
-*/
+  // get all the info from the post
+  const fetchPost = async (postID) => {
+    const response = await fetch('http://localhost:8000/post/${postID}', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await response.json()
+    console.log(data)
+    return data
+  }
+
+/*
   const posts = [
       {
         "id": 1,
@@ -74,7 +92,7 @@ const ProfileScreen = (props) => {
         "image": "https://i.pinimg.com/originals/0c/0d/0d/0c0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d.jpg",
       },
     ];
-
+*/
   return (
     <SafeAreaView style={styles.page}>
       <View name='header_container' style={styles.header_container}>
@@ -91,10 +109,10 @@ const ProfileScreen = (props) => {
       </View>
       <View name='login_container' style={styles.profileImg_container}>
         <Image style={styles.profileImg} source={require('../../assets/defaultImage.png')}/>
-        <Text style={styles.text}>My username {/*profileInfo.username || username */}</Text>
+        <Text style={styles.text}>{profileInfo.username}</Text>
       </View>
       <View>
-        <Text style={styles.bioText}>This is the user's description {/*profileInfo.description*/}</Text>
+        <Text style={styles.bioText}>{profileInfo.description}</Text>
       </View>
       <View name='container' style={styles.container}>
         <Text style={styles.text}>Your Memories</Text>
@@ -102,12 +120,13 @@ const ProfileScreen = (props) => {
       <ScrollView>
         <View name='posts_container' style={styles.posts_container}>
           {posts.map((post) => (
-            <TouchableOpacity key={post.id} style={styles.posts_container} onPress={() => navigation.navigate('Post', {
+            <TouchableOpacity key={post.id} style={styles.posts_container} onPress={() => {fetchPost(post.id) , navigation.navigate('Post', {
               username: post.user,
               postID : post.id, 
               postImage : post.image,
               postDescription : post.description,
-            })}>
+              postTime: post.time
+            })}}>
               <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
             </TouchableOpacity>
           ))}

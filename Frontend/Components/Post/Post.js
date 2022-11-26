@@ -12,9 +12,26 @@ const Post = (props) => {
   const username = props.username
   const postDescription = props.postDescription
   const postImage = props.postImage
-  const userID =props.userID
+  const postTime = props.postTime
+  const postID = props.postID
 
   const [comment, setComment] = React.useState('')
+  
+  const [comments_list, setCommentsList] = React.useState([])
+
+  // get all commets from a post
+  useEffect(() => {
+    axios
+      .get('http://localhost:8000/get_comments/${postID}')
+      .then((response) => {
+        console.log(response.data)
+        setCommentsList(response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })  
+  }, [])
+
 
   const fetchMakeComment = async () => {
     const response = await fetch('http://localhost:8000/send_comment', {
@@ -25,7 +42,7 @@ const Post = (props) => {
       body: JSON.stringify({
         "comment": comment, 
         "postID": postID,
-        "userID": user,
+        "auhtor": user,
       })
     })
     const data = await response.json()
@@ -33,7 +50,7 @@ const Post = (props) => {
 
     Alert.alert('Já funfa!')
   }
-
+  
   const Separator = () => {
     return <View style={styles.separator} />
   };
@@ -50,29 +67,31 @@ const Post = (props) => {
       <View style={styles.header2}>
         <Image style={styles.profileImg} source={require('../../assets/defaultImage.png')}/>
         <View style={styles.username}>
-          <Text style={styles.text1}>Username</Text>
-          <Text style={styles.text2}>{/*postMessage.time*/} 2h Late</Text>
+          <Text style={styles.text1}>{username}</Text>
+          <Text style={styles.text2}>{postTime}Late</Text>
         </View>
       </View>
       <View style={styles.image}>
         <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
       </View>
       <View style={styles.description_container}>
-        <Text style={styles.user}>{/*postMessage.description*/}User 3</Text>
-        <Text style={styles.description}>This is the description</Text>
+        <Text style={styles.user}>{username}</Text>
+        <Text style={styles.description}>{postDescription}</Text>
       </View>
       <Separator/>
       <View style={styles.comment_button_container}>
         <TextInput style={styles.comment_input} onChangeText={setComment} value={comment} placeholder="Write a comment..."/>
         <TouchableOpacity style={styles.comment_button} onPress={fetchMakeComment}>
-          <Image style={styles.submitImg} source={require('../../assets/comment.png')}/>
+          <Image style={styles.submitImg} source={require(postImage.url)}/>
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.comments}>
-        <Text style={styles.textComment}>{/*{comments.user.username}: comments.comment*/}User1: Comment 1 caralho</Text>
-        <Text style={styles.textComment}>{/*Comment*/}User1: Comment 2 puta</Text>
-        <Text style={styles.textComment}>{/*Comment*/}User1: Comment 3 foda-se</Text>
-        <Text style={styles.textComment}>{/*Comment*/}User1: Comment 4 espero que funcione pq isto é grande p caralho</Text>
+          {comments_list.map((comment) => (
+            <View key={comment.id} style={styles.comments}>
+              <Text style={styles.text1}>{comment.author.username}</Text>
+              <Text style={styles.text2}>{comment.comment}</Text>
+            </View>
+            ))}
       </ScrollView>
     </View>
   </SafeAreaView>
@@ -120,6 +139,7 @@ const styles = StyleSheet.create({
     width: 400,
     height: 350,
   },
+  //--------------------------
   comments:{
     display: 'flex',
     flexDirection: 'column',
@@ -129,6 +149,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginLeft: 10,
   },
+  //--------------------------
   comment_button_container:{
     marginTop: 10,
     display: 'flex',

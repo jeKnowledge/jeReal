@@ -4,7 +4,7 @@ import { getTokenFromStorage } from "./hooks/functions";
 let AuthDispatchContext = createContext(undefined);
 AuthDispatchContext.displayName = "AuthDispatchContext";
 
-let AuthStateContext = createContext();
+let AuthStateContext = createContext(undefined);
 AuthStateContext.displayName = "AuthStateContext";
 
 const initialState = {
@@ -13,7 +13,8 @@ const initialState = {
   error: null,
 };
 
-// context reducer:
+// context reducer:~
+
 const reducer = (state, action) => {
   switch (action.type) {
     case "login": {

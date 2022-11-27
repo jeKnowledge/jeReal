@@ -82,7 +82,7 @@ const Post = (props) => {
       <View style={styles.comment_button_container}>
         <TextInput style={styles.comment_input} onChangeText={setComment} value={comment} placeholder="Write a comment..."/>
         <TouchableOpacity style={styles.comment_button} onPress={fetchMakeComment}>
-          <Image style={styles.submitImg} source={require(postImage.url)}/>
+          <Image style={styles.submitImg} source={require('../../assets/defaultImage.png')}/>
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.comments}>

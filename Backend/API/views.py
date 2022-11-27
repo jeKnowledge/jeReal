@@ -1,7 +1,7 @@
 #from audioop import reverse
 import datetime
 import json
-
+from rest_framework.response import Response
 import jwt
 from django.contrib import messages
 from django.contrib.auth import authenticate
@@ -14,31 +14,37 @@ from google.oauth2 import id_token
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Post, Profile, User, NewUser, Comment
+from .models import Post, Profile, NewUser, Comment
 from .serializers import PostSerializer, ProfileSerializer, NewUserSerializer, CommentSerializer
 
 # Create your views here.
 CLIENT_ID ='549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com'
 
-@login_required(login_url='login/')
+#@login_required(login_url='login/')
 @api_view(['GET'])
 def profile(request, pk):
     if request.method == 'GET':
-        user = NewUser.objects.get(username=pk)
-        profile = Profile.objects.get(user=user)
-        posts = Post.objects.filter(user=pk)
-    
+        user = NewUser.objects.get(pk=pk)
+        profile = Profile.objects.get(pk=pk)
+        print('profile name:', profile.user.username)
+        print('profile description:', profile.description)
+        print('profile image:', profile.profileImg)
+        print('profile data joined:', profile.date_joined)
+        posts = Post.objects.filter(user=user)
 
-        profile_serializer = ProfileSerializer(profile, many=False)
-        posts_serializer = PostSerializer(posts, many=True)
+
+        profile_serializer = ProfileSerializer(data=profile, many=False)
+        posts_serializer = PostSerializer(data=posts, many=True)
         if profile_serializer.is_valid() and posts_serializer.is_valid():
-
+            
             profile_serializer.save()
             posts_serializer.save()
-
-            return JsonResponse({'profile': profile_serializer.data, 'posts': posts_serializer.data}, status=status.HTTP_200_OK)
+            return JsonResponse({'profile': profile_serializer.initial_data, 'posts': posts_serializer.initial_data}, status=status.HTTP_200_OK)
         else:
-            return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Serializers estão fodidos'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return JsonResponse({'error': 'Error'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # view to get all info about a post
 @api_view(['GET'])
@@ -189,7 +195,7 @@ def login_register_google(request):
         idinfo = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
         print(idinfo)
 
-        userid = idinfo['email']
+        userid = idinfo['name']
         
         if userid is None:
             return JsonResponse({'message': 'Invalid Google Token'}, status=status.HTTP_400_BAD_REQUEST)
@@ -197,39 +203,63 @@ def login_register_google(request):
         userid = userid.lower().strip()
 
         # if user already exists
-        if NewUser.objects.filter(email=userid).exists():
-            user = NewUser.objects.get(email=userid)
-            serializer = NewUserSerializer(user)
-            print(serializer.data)
+
+        user1 = NewUser.objects.filter(username=idinfo['name']).exists()
+        if user1:
+            user = NewUser.objects.get(username=idinfo['name'])
+            user_serializer = NewUserSerializer(user)
+            profile = Profile.objects.get(user=user)
+            profile_serializer = ProfileSerializer(profile)
+            #print(serializer.data)
+            user_pk = user.pk
+            print('primary key:', user_pk)
 
             # create token for user to login
             token = jwt.encode({
-                'id': serializer.data['username'] + serializer.data['email'],
+                'id': user_serializer.data['username'] + user_serializer.data['email'],
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=365)
             }, 'secret', algorithm='HS256')
-            return JsonResponse({"key": str(token), "user": serializer.data}, status=status.HTTP_200_OK)
+            return JsonResponse({"key": str(token), "user":{'pk': user_pk, 'username' : user_serializer.data['username'],
+            'email' : user_serializer.data['email'], 'profileImg': profile_serializer.data['profileImg'],
+            }}, status=status.HTTP_200_OK)
 
         # if user doesn't exist yet
         else:
-            body['email'] = body['email'].lower().strip()
-
-            domain = body['email'].split('@')[1]
+            
+            #domain = userid.split('@')[1]
+            '''
             if domain != 'jeknowledge.com':
                 return JsonResponse({'message': 'Invalid email domain'}, status=status.HTTP_400_BAD_REQUEST)
-            
+            '''
              # check if the email already exists
-            if User.objects.filter(email=body['email']).exists():
+            if NewUser.objects.filter(email=userid).exists():
                 return JsonResponse({'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = NewUserSerializer(data=body)
-            if serializer.is_valid():
-                serializer.save()
+            user = NewUser.objects.create(username=idinfo['given_name'], email=idinfo['email'])
+            user.save()
+
+            user_model = NewUser.objects.get(username=idinfo['given_name'])
+            new_profile = Profile.objects.create(user=user_model,profileImg=idinfo['picture'])
+            new_profile.save()
+            #get user´s pk
+            
+
+            userSerializer = NewUserSerializer(user_model)
+            profileSerializer = ProfileSerializer(new_profile)
+            if userSerializer.is_valid() and profileSerializer.is_valid():
+                userSerializer.save()
+                profileSerializer.save()
                 token = jwt.encode({
-                    'id': serializer.data['username'] + serializer.data['email'],
+                    'id': userSerializer.data['username'] + userSerializer.data['email'],
                     'exp': datetime.datetime.utcnow() + datetime.timedelta(days=365)
                 }, 'secret', algorithm='HS256')
-                return JsonResponse({"key": str(token)}, status=status.HTTP_200_OK)
-            return JsonResponse({serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse({"key": str(token), "user": {
+                    'pk': user_model.pk,
+                    "username": userSerializer.data['username'],
+                    "email": userSerializer.data['email'],
+                    "profileImg": profileSerializer.data['profileImg'],     
+                }}, status=status.HTTP_200_OK)
+            return JsonResponse({'error':userSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     except ValueError as e:
         print(e)

@@ -7,25 +7,21 @@ from django.utils import timezone
 # Create your models here.
 
 
-#User = get_user_model()
 
 class NewUser(models.Model):
-    id_token = models.CharField(max_length=150, primary_key=True, unique=True)
+    #id_token = models.CharField(max_length=150, primary_key=True, unique=True)
+    #id = models.UUIDField(primary_key=True, unique=True, editable=False)
     username = models.CharField(max_length=150)
-    email = models.EmailField(max_length=150)
-    password = models.CharField(max_length=150)
-
+    email = models.EmailField(max_length=150, unique=True)
 
 
 class Profile(models.Model):
     user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
-    id_profile = models.IntegerField()
     description = models.TextField(blank = True)
     profileImg = models.ImageField(upload_to='profileImg', blank = True, null = True, default = '../assets/defaultImage.png')
     date_joined = models.DateTimeField(default=timezone.now)
 
 class Post(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='postImg')
     description = models.TextField(max_length = 500, blank = True)
@@ -33,7 +29,6 @@ class Post(models.Model):
     lateTime = models.IntegerField(default=0)
     
 class Comment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(NewUser, on_delete=models.CASCADE)
     postID = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment = models.TextField(max_length = 500, blank = False)

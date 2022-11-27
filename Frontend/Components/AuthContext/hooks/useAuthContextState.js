@@ -1,9 +1,9 @@
 import React, {useContext } from "react";
-import { AuthStateContext } from "expo/AppEntry";
+import { AuthStateContext } from "..";
 
 const useAuthState = () => {
   const state = useContext(AuthStateContext);
-
+  console.log("state", state);
   if (!state) throw Error("useAuthState must be used within AuthStateContext");
 
   const {

@@ -11,28 +11,37 @@ const ProfileScreen = (props) => {
   
   const [ posts, setPosts] = useState([])
   const [ profileInfo, setProfileInfo] = useState([])
+
   
   
  // recebe o username do perfil que está a ser visitado através das props
-  const username = props.username;
+  //const username = props.username;
+  const getIDFromStorage = async () => {
+    const idls = await AsyncStorageLib.getItem("id");
+    return idls;
+  };
+  
 
-
+  
   useEffect(() => {
-    axios
-      .get('http://localhost:8000/profile/${username}')
-      .then((response) => {
-        console.log(response.data)
-        setPosts(response.data.posts)
-        setProfileInfo(response.data.profile)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    getIDFromStorage().then((idls) => {
+      console.log('id', idls);
+      axios
+        .get('https://5376-217-129-165-136.eu.ngrok.io/profile/' + idls + '/')
+        .then((response) => {
+          console.log(response.data)
+          setPosts(response.data.posts)
+          setProfileInfo(response.data.profile)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    })
   }, [])
 
   // get all the info from the post
   const fetchPost = async (postID) => {
-    const response = await fetch('http://localhost:8000/post/${postID}', {
+    const response = await fetch('https://5376-217-129-165-136.eu.ngrok.io/post/${postID}', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

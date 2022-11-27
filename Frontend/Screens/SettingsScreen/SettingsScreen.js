@@ -3,10 +3,11 @@ import React from 'react'
 import UserPermissions from '../../Utilities/UserPermissions';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
-
-
+import  useAuthDispatch  from '../../Components/AuthContext/hooks/useAuthContextDispatch';
+import AsyncStorageLib from "@react-native-async-storage/async-storage";
 const SettingsScreen = () => {
   const navigation = useNavigation();
+  const { logout } = useAuthDispatch();
 
   state = {
     user: {
@@ -60,6 +61,12 @@ const SettingsScreen = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await AsyncStorageLib.clear();
+    logout();
+  };
+
+
   const Separator = () => {
     return <View style={styles.separator} />
   };
@@ -97,6 +104,7 @@ const SettingsScreen = () => {
     </SafeAreaView>
   )
 }
+
 
 export default SettingsScreen
 

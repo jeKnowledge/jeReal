@@ -27,7 +27,7 @@ const ProfileScreen = (props) => {
     getIDFromStorage().then((idls) => {
       console.log('id', idls);
       axios
-        .get('https://5376-217-129-165-136.eu.ngrok.io/profile/' + idls + '/')
+        .get('https://1c30-2a01-11-320-18a0-1cd9-9f11-634-a5f2.eu.ngrok.io/profile/' + idls + '/')
         .then((response) => {
           console.log(response.data)
           setPosts(response.data.posts)
@@ -39,16 +39,35 @@ const ProfileScreen = (props) => {
     })
   }, [])
 
+  // decode the image uri in url
+  const decodeUri = (uri) => {
+    return decodeURIComponent(uri);
+  }
+
+  const profileURL = decodeUri(profileInfo.profileImg);
+  const profileImgURL = profileURL.slice(1); 
+  
   // get all the info from the post
   const fetchPost = async (postID) => {
-    const response = await fetch('https://5376-217-129-165-136.eu.ngrok.io/post/${postID}', {
+    const response = await fetch('https://5376-217-129-165-136.eu.ngrok.io/post/' + postID + '/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     })
-    const data = await response.json()
-    console.log(data)
+    if(!response){
+      return;
+    }
+    console.log("response", response);
+
+    const data = await response.json();
+
+    if(response.status !== 200){
+      setError(true);
+      return;
+    }
+
+    console.log("data: ", data)
     return data
   }
 
@@ -117,8 +136,9 @@ const ProfileScreen = (props) => {
         </TouchableOpacity>
       </View>
       <View name='login_container' style={styles.profileImg_container}>
-        <Image style={styles.profileImg} source={require('../../assets/defaultImage.png')}/>
-        <Text style={styles.text}>{profileInfo.username}</Text>
+        <Image style={styles.profileImg} source={{uri:profileImgURL}}/>
+        <Text style={styles.text}>{profileInfo.user}</Text>
+        <Text style={styles.textDate}>Joined on {profileInfo.date_joined}</Text>
       </View>
       <View>
         <Text style={styles.bioText}>{profileInfo.description}</Text>
@@ -129,16 +149,19 @@ const ProfileScreen = (props) => {
       <ScrollView>
         <View name='posts_container' style={styles.posts_container}>
           {posts.map((post) => (
-            <TouchableOpacity key={post.id} style={styles.posts_container} onPress={() => {fetchPost(post.id) , navigation.navigate('Post', {
+            postTime = post.creationTime.slice(11,19),
+            console.log('time: ', postTime),
+            <TouchableOpacity key={post.pk} style={styles.posts_container} onPress={() => {fetchPost(post.pk) , navigation.navigate('Post', {
               username: post.user,
-              postID : post.id, 
+              postID : post.pk, 
               postImage : post.image,
               postDescription : post.description,
-              postTime: post.time
+              postTime: postTime,
             })}}>
-              <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
+              <Image style={styles.postImg} source={{uri: post.image}}/>
             </TouchableOpacity>
-          ))}
+          ), console.log('AQUI'),
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -225,5 +248,11 @@ const styles = StyleSheet.create({
     height: 100,
     resizeMode: 'contain',
     margin: 5,
+  },
+  textDate:{
+    color: 'white',
+    fontSize: 15,
+    textAlign: 'center',
+    marginTop: 10,
   },
 })

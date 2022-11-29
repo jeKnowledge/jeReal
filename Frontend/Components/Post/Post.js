@@ -3,26 +3,38 @@ import React from 'react'
 import { Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
+//import useEffect
+import { useEffect } from 'react'
+//import axios
+import axios from 'axios'
 
 
 const Post = (props) => {
 
   const navigation = useNavigation();
+
+  console.log('props', props)
   
-  const username = props.username
-  const postDescription = props.postDescription
-  const postImage = props.postImage
-  const postTime = props.postTime
-  const postID = props.postID
+  const username = props.navigation.route.params.username
+  console.log('username', username)
+  const postDescription = props.navigation.route.params.postDescription
+  console.log('postDescription', postDescription)
+  const postImage = props.navigation.route.params.postImage
+  console.log('postImage', postImage)
+  const postTime = props.navigation.route.params.postTime
+  console.log('postTime', postTime)
+  //const postID = props.navigation.route.params.postID
+  //console.log('postID', postID)
 
   const [comment, setComment] = React.useState('')
   
   const [comments_list, setCommentsList] = React.useState([])
 
   // get all commets from a post
+  
   useEffect(() => {
     axios
-      .get('http://localhost:8000/get_comments/${postID}')
+      .get('https://5376-217-129-165-136.eu.ngrok.io/get_comments/' + postID +'/')
       .then((response) => {
         console.log(response.data)
         setCommentsList(response.data)
@@ -34,7 +46,7 @@ const Post = (props) => {
 
 
   const fetchMakeComment = async () => {
-    const response = await fetch('http://localhost:8000/send_comment', {
+    const response = await fetch('https://5376-217-129-165-136.eu.ngrok.io/send_comment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -6,15 +6,6 @@ class NewUserSerializer(serializers.ModelSerializer):
         model = NewUser
         fields = ('username', 'email')
 
-        def create(self, validated_data):
-            user = NewUser(
-                id_token = validated_data['id_token'],
-                username=validated_data['username'],
-                email=validated_data['email'],
-            )
-            user.save()
-            return user
-
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
@@ -23,7 +14,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('user', 'image', 'description')
+        fields = ('user', 'image', 'description', 'pk', 'creationTime', 'lateTime')
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

@@ -11,25 +11,25 @@ from django.utils import timezone
 class NewUser(models.Model):
     #id_token = models.CharField(max_length=150, primary_key=True, unique=True)
     #id = models.UUIDField(primary_key=True, unique=True, editable=False)
-    username = models.CharField(max_length=150)
+    username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(max_length=150, unique=True)
 
 
 class Profile(models.Model):
-    user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(NewUser, to_field="username", on_delete=models.CASCADE)
     description = models.TextField(blank = True)
     profileImg = models.ImageField(upload_to='profileImg', blank = True, null = True, default = '../assets/defaultImage.png')
-    date_joined = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateField(auto_now_add=True)
 
 class Post(models.Model):
-    user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(NewUser, to_field="username", on_delete=models.CASCADE)
     image = models.ImageField(upload_to='postImg')
     description = models.TextField(max_length = 500, blank = True)
     creationTime = models.DateTimeField(default=timezone.now)
     lateTime = models.IntegerField(default=0)
     
 class Comment(models.Model):
-    author = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    author = models.ForeignKey(NewUser, to_field="username", on_delete=models.CASCADE)
     postID = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment = models.TextField(max_length = 500, blank = False)
 

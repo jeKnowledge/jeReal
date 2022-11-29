@@ -55,7 +55,7 @@ const LoginScreen = ({navigation}) => {
     console.log("token", id_token);
     try {
       // Dúvida -> este fetch é o request para a API?
-      const response = await fetch('https://5376-217-129-165-136.eu.ngrok.io/login_register_google/', {
+      const response = await fetch('https://1c30-2a01-11-320-18a0-1cd9-9f11-634-a5f2.eu.ngrok.io/login_register_google/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,9 +68,10 @@ const LoginScreen = ({navigation}) => {
         return;
       }
       console.log("response", response);
-
+  
       const data = await response.json();
       console.log("Google OAuth Final Token", data);
+
       if(response.status !== 200){
         setError(true);
         return;

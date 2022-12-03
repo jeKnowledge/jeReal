@@ -181,11 +181,11 @@ def login_register_google(request):
         # if user doesn't exist yet
         else:
             
-            #domain = userid.split('@')[1]
-            '''
+            domain = userid.split('@')[1]
+            
             if domain != 'jeknowledge.com':
                 return JsonResponse({'message': 'Invalid email domain'}, status=status.HTTP_400_BAD_REQUEST)
-            '''
+            
              # check if the email already exists
             if NewUser.objects.filter(email=userid).exists():
                 return JsonResponse({'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)

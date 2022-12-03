@@ -26,19 +26,7 @@ def profile(request, pk):
     if request.method == 'GET':
         user_object = NewUser.objects.get(pk=pk)
         profile = Profile.objects.get(user=user_object)
-        print('profile name:', profile.user.username)
-        print('profile description:', profile.description)
-        print('profile image:', profile.profileImg)
-        print('profile data joined:', profile.date_joined)
         posts = Post.objects.filter(user=user_object)
-
-        for post in posts:
-            print('post author: ', post.user.username)
-            print('post image:', post.image.url)
-            print('post description:', post.description)
-            print('post date posted:', post.creationTime)
-
-
 
         profile_serializer = ProfileSerializer(profile, many=False)
         posts_serializer = PostSerializer(posts, many=True)

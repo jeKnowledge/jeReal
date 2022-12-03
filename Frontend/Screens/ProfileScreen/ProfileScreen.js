@@ -4,6 +4,7 @@ import axios from 'axios'
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
 import { NavigationContainerRefContext } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native';
+import { SERVER_URL } from '@env';
 
 
 const ProfileScreen = (props) => {
@@ -15,7 +16,7 @@ const ProfileScreen = (props) => {
   
   
  // recebe o username do perfil que está a ser visitado através das props
-  //const username = props.username;
+  //const {username} = props.route.params;
   const getIDFromStorage = async () => {
     const idls = await AsyncStorageLib.getItem("id");
     return idls;
@@ -27,9 +28,9 @@ const ProfileScreen = (props) => {
     getIDFromStorage().then((idls) => {
       console.log('id', idls);
       axios
-        .get('https://1c30-2a01-11-320-18a0-1cd9-9f11-634-a5f2.eu.ngrok.io/profile/' + idls + '/')
+        .get( SERVER_URL + '/profile/' + idls + '/')
         .then((response) => {
-          console.log(response.data)
+          //console.log(response.data)
           setPosts(response.data.posts)
           setProfileInfo(response.data.profile)
         })
@@ -47,9 +48,10 @@ const ProfileScreen = (props) => {
   const profileURL = decodeUri(profileInfo.profileImg);
   const profileImgURL = profileURL.slice(1); 
   
+  
   // get all the info from the post
   const fetchPost = async (postID) => {
-    const response = await fetch('https://5376-217-129-165-136.eu.ngrok.io/post/' + postID + '/', {
+    const response = await fetch(SERVER_URL + '/post/' + postID + '/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +60,7 @@ const ProfileScreen = (props) => {
     if(!response){
       return;
     }
-    console.log("response", response);
+    //console.log("response", response);
 
     const data = await response.json();
 
@@ -70,6 +72,7 @@ const ProfileScreen = (props) => {
     console.log("data: ", data)
     return data
   }
+
 
 /*
   const posts = [
@@ -131,7 +134,11 @@ const ProfileScreen = (props) => {
         </TouchableOpacity>
         <Text style={styles.text}>Profile</Text>
 
-        <TouchableOpacity style={styles.edit_profile_button} onPress={() => navigation.navigate('SettingsScreen')}>
+        <TouchableOpacity style={styles.edit_profile_button} onPress={() => navigation.navigate('SettingsScreen', {
+          username: profileInfo.user,
+          profileIMGURL: profileImgURL,
+          profileDescription: profileInfo.description,
+        })}>
           <Text style={styles.button_text}>Settings</Text>
         </TouchableOpacity>
       </View>
@@ -150,17 +157,18 @@ const ProfileScreen = (props) => {
         <View name='posts_container' style={styles.posts_container}>
           {posts.map((post) => (
             postTime = post.creationTime.slice(11,19),
-            console.log('time: ', postTime),
+            //console.log('time: ', postTime),
             <TouchableOpacity key={post.pk} style={styles.posts_container} onPress={() => {fetchPost(post.pk) , navigation.navigate('Post', {
+              profileImgURL : profileImgURL,
               username: post.user,
               postID : post.pk, 
               postImage : post.image,
               postDescription : post.description,
               postTime: postTime,
             })}}>
-              <Image style={styles.postImg} source={{uri: post.image}}/>
+              <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
             </TouchableOpacity>
-          ), console.log('AQUI'),
+          ),
           )}
         </View>
       </ScrollView>

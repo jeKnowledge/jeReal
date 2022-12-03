@@ -31,6 +31,7 @@
     "react": "18.0.0",
     "react-hook-form": "^7.39.3",
     "react-native": "0.69.6",
+    "react-native-dotenv": "^3.4.2",
     "react-native-image-picker": "^4.10.1",
     "react-native-login-google": "^2.0.3",
     "react-native-navigation-hooks": "^6.3.0",

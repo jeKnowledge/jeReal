@@ -11,6 +11,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ('user', 'description', 'profileImg', 'date_joined')
 
+    # update the description and profileImg of the profile
+    def update(self, instance, validated_data):
+        instance.description = validated_data.get('description', instance.description)
+        instance.save()
+        return instance
+
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
@@ -19,4 +25,4 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('userID', 'postID', 'comment')
+        fields = ('author', 'postID', 'comment')

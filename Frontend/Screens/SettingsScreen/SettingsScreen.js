@@ -5,54 +5,65 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import  useAuthDispatch  from '../../Components/AuthContext/hooks/useAuthContextDispatch';
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
-const SettingsScreen = () => {
+import { SERVER_URL } from '@env';
+
+const SettingsScreen = (props) => {
   const navigation = useNavigation();
   const { logout } = useAuthDispatch();
 
+  //console.log('props', props)
+  const {username , profileIMGURL, profileDescription} = props.route.params
+  
   state = {
     user: {
-      username: '',
+      username: username,
       email: '',
       password: '',
-      avatar: null
+      avatar: profileIMGURL,
     },
     errorMessage: null
   }
 
-  const [description, setDescription] = React.useState('');
+  const [image, setImage] = React.useState(null);
 
+  if (image == null) {
+    setImage(profileIMGURL)
+  }
+
+  const [description, setDescription] = React.useState('');
+/*
   handlePickAvatar = async () => {
     UserPermissions.getCameraPermission();
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
+      quality: 1,
     });
 
+    console.log(result);
     if (!result.cancelled) {
-      this.setState({ user: { ...this.state.user, avatar: result.uri } });
+      console.log('assets: ', result.uri)
+      setImage(result.uri);
     }
   };
-
+*/
   handleSubmitSettings = async () => {
-    const { username, email, password, avatar } = this.state.user;
-
     try {
-      const response = await fetch('http://localhost:3000/settings/${username}/', {
+      const response = await fetch(SERVER_URL + '/settings/' + state.user.username + '/', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           description: description,
-          avatar: avatar
         })
       })
-      const data = await response.json();
-      console.log(data);
-      if (data.status === 200) {
-        this.props.navigation.navigate('ProfileScreen');
+
+      if (response.status === 200) {
+        navigation.navigate('ProfileScreen');
+        alert('Profile updated successfully');
       } else {
         alert('Something went wrong');
       }
@@ -81,15 +92,13 @@ const SettingsScreen = () => {
       </View>
       <Separator/>
       <View style={styles.header2}>
-        <Text style={styles.text}>Update your Profile picture here</Text>
-        <TouchableOpacity onPress={() => handlePickAvatar()}>
-          <Image style={styles.profileImg} source={require('../../assets/plusCircle.png')}/>
-        </TouchableOpacity>
+        <Text style={styles.text}>Update your profile description here</Text>
+        <Image style={styles.profileImg} source={{uri: image}}/>
       </View>
       <View style={styles.body}>
         <Text style={styles.descriptionText}>Description</Text>
         <TextInput style={styles.description}
-          placeholder='Update your description'
+          placeholder={profileDescription}
           onChangeText={newDescription => setDescription(newDescription)}
           defaultValue={description}/>
       </View>

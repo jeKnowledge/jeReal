@@ -17,7 +17,7 @@ class NewUser(models.Model):
 
 class Profile(models.Model):
     user = models.ForeignKey(NewUser, to_field="username", on_delete=models.CASCADE)
-    description = models.TextField(blank = True)
+    description = models.TextField(blank = True, null = True)
     profileImg = models.ImageField(upload_to='profileImg', blank = True, null = True, default = '../assets/defaultImage.png')
     date_joined = models.DateField(auto_now_add=True)
 

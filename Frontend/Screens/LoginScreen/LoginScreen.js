@@ -5,15 +5,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import useAuthDispatch from '../../Components/AuthContext/hooks/useAuthContextDispatch';
 import AsyncStorageLib from "@react-native-async-storage/async-storage";
+import { SERVER_URL, EXPO_CLIENT_ID } from '@env';
 
 
-/*
-GoogleSignin.configure({
-  expoClientId: '549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com',
-  offlineAccess: true,
-  hostedDomain: 'jeknowledge.com',
-});
-*/
+
 const initialState = {
   userInfo: null,
 };
@@ -41,7 +36,7 @@ const LoginScreen = ({navigation}) => {
 
   
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    expoClientId:'549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com',
+    expoClientId:EXPO_CLIENT_ID,
     androidClientId:'',
     iosClientId:'',
   })
@@ -54,8 +49,7 @@ const LoginScreen = ({navigation}) => {
     const { id_token } = response.params;
     console.log("token", id_token);
     try {
-      // Dúvida -> este fetch é o request para a API?
-      const response = await fetch('https://1c30-2a01-11-320-18a0-1cd9-9f11-634-a5f2.eu.ngrok.io/login_register_google/', {
+      const response = await fetch(SERVER_URL + '/login_register_google/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +76,6 @@ const LoginScreen = ({navigation}) => {
       console.log("user", user);
 
       console.log("user", user);
-     //const token = key.slice(2, key.length -1);
 
       await AsyncStorageLib.setItem('token', key);
       await AsyncStorageLib.setItem('id', user.pk.toString());
@@ -90,6 +83,7 @@ const LoginScreen = ({navigation}) => {
       await AsyncStorageLib.setItem('email', user.email);
       await AsyncStorageLib.setItem('userProfilePicture', user.profileImg);
       login(user);
+      navigation.navigate('ProfileScreen');
     } catch (error) {
       console.log(error);
     }
@@ -102,61 +96,7 @@ const LoginScreen = ({navigation}) => {
     }
   }, [response]);
 
-/*
-  const signIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      this.initialState.userInfo = userInfo;
 
-      // send the user info to the backend
-      const response = await fetch('http://localhost:8000/login_register_google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            token: userInfo.idToken
-          })
-      })
-      if(!response){
-        return;
-      }
-      console.log("response", response);
-
-      const data = await response.json();
-      console.log("Google OAuth Final Token", data);
-      if(response.status !== 200){
-        setError(true);
-        return;
-      }
-      
-      const { key, user} = data;
-
-      const token = key.slice(2, key.length -1);
-
-      await AsyncStorageLib.setItem('token', token);
-      await AsyncStorageLib.setItem('username', userInfo.user.name);
-      await AsyncStorageLib.setItem('email', userInfo.user.email);
-      await AsyncStorageLib.setItem('userProfilePicture', userInfo.user.photo);
-      
-    } catch (error) {
-      Alert.alert('Error', error.message);
-      
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        Alert.alert('Cancelado pelo usuário');
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        Alert.alert('Operação em andamento');
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        Alert.alert('Play Services não disponível ou atualizado');
-      } else {
-        Alert.alert('Erro desconhecido');
-      }
-      
-    }
-  };
-
-*/
   return (
     <SafeAreaView style={styles.page}>
       <View name='logo_container' style={styles.container}>

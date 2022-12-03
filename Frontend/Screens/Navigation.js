@@ -3,7 +3,7 @@ import useAuthState  from "../Components/AuthContext/hooks/useAuthContextState";
 import LoginScreen from './LoginScreen/LoginScreen';
 import ProfileScreen from './ProfileScreen/ProfileScreen';
 import SettingsScreen from './SettingsScreen/SettingsScreen';
-import Post from '../Components/Post/Post';
+import PostScreen from './PostScreen/PostScreen';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -23,7 +23,7 @@ const Navigation = () => {
             ) : (
               <>
                 <Screen name="ProfileScreen" component={ProfileScreen} />
-                <Screen name="Post" component={Post} />
+                <Screen name="PostScreen" component={PostScreen} />
                 <Screen name="SettingsScreen" component={SettingsScreen} />
               </>
             )}

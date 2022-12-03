@@ -20,7 +20,7 @@ from .serializers import PostSerializer, ProfileSerializer, NewUserSerializer, C
 # Create your views here.
 CLIENT_ID ='549033196869-f3m6urgh42k5rd7kqsdeapc2n1bpdk8p.apps.googleusercontent.com'
 
-#@login_required(login_url='login/')
+# DONE! iT WORKS!
 @api_view(['GET'])
 def profile(request, pk):
     if request.method == 'GET':
@@ -48,6 +48,7 @@ def profile(request, pk):
 
 
 # view to get all info about a post
+# DONE! iT WORKS!
 @api_view(['GET'])
 def get_post(request, pk):
     if request.method == 'GET':
@@ -58,75 +59,71 @@ def get_post(request, pk):
         return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@login_required(login_url='login/')
+# DONE! iT WORKS!
 def get_comments(request, pk):
     if request.method == 'GET':
         comments = Comment.objects.filter(postID=pk)
         serializer = CommentSerializer(comments, many=True)
 
-        if serializer.is_valid():
-            return JsonResponse(serializer.data, safe=False)
-        else:
-            return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
-@login_required(login_url='login/')
+#@login_required(login_url='login/')
+# DONE! iT WORKS!
 @api_view(['POST'])
 def send_comment(request):
-    serializer = CommentSerializer(request.data)
+    
+    body = json.loads(request.body)
+    print("Request data: ", body)
+
+    serializer = CommentSerializer(data=body)
+    print(serializer)
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
-@login_required(login_url='login/')
+#@login_required(login_url='login/')
+# DONE! iT WORKS!
 def settings(request, pk):
-    print(request.user)
     user_profile = Profile.objects.get(user=pk)
-
-    if request.method == 'POST':
-        if request.FILES.get('avatar') == None:
-            profileImg = user_profile.profileImg
-            description = request.POST.get('description')
-
-            user_profile.profileImg = profileImg
-            user_profile.description = description
-            user_profile.save()
-
-        if request.FILES.get('avatar') != None:
-            profileImg = request.FILES['avatar']
-            description = request.POST.get('description')
-
-            user_profile.profileImg = profileImg
-            user_profile.description = description
-            user_profile.save()
-        
-        return JsonResponse({'message': 'Profile updated'}, status=status.HTTP_200_OK)
     
-    elif request.method == 'PUT':
+    if request.method == 'PUT':
+        body = json.loads(request.body)
+        # add the user to the body
+        body['user'] = pk
 
-        if request.FILES.get('avatar') == None:
-            profileImg = user_profile.profileImg
-        else: 
-            profileImg = request.FILES['avatar']
+        serializer = ProfileSerializer(data=body)
+        if serializer.is_valid():
+            #update the profile with the new data calling the serializer update method
+            serializer.update(user_profile, serializer.validated_data)
+            #serializer.save()
+            response = JsonResponse({'message':'Profile updated successfully!'}, status=status.HTTP_200_OK)
+            print(response)
+            return JsonResponse({'message':'Profile updated successfully!'}, status=status.HTTP_200_OK)
+        else:
+           #print serializer error
+            print(serializer.errors)
+            return JsonResponse({'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
 
-        description = request.POST.get('description')
-
-        print(description)
-
-        user_profile.profileImg = profileImg
-        user_profile.description = description
-        user_profile.save()
-
-    return JsonResponse({'message':'Profile updated successfully!'}, status=status.HTTP_200_OK)
+    return JsonResponse({'message':'Deu merda aqui!'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# =============================================
+'''
+{
+    'user': "Guilherme",
+    'description': 'Olá malta!', 
+    'profileImg': 'file:///var/mobile/Containers/Data/Application/29959E75-44D3-4102-B1AB-ED7588796D08/Library/Caches/ExponentExperienceData/%2540guiffaria%252FFrontend/ImagePicker/B5D73644-6C50-4631-B8A7-2488529FDFE1.jpg'
+}
+'''
 
-# body -> username, password, email
+# DONE! iT WORKS!
 # -------Login and Register view with Google-----~
 @api_view(['POST'])
 def login_register_google(request):
+
 
     body = json.loads(request.body)
 
@@ -150,10 +147,19 @@ def login_register_google(request):
         user1 = NewUser.objects.filter(email=idinfo['email']).exists()
         print(user1)
         if user1:
-            print("ENTROU AQUI")
+
+            print('picture: ', idinfo['picture'])
+
             user = NewUser.objects.get(email=idinfo['email'])
             user_serializer = NewUserSerializer(user)
             profile = Profile.objects.get(user=user)
+
+            # verify if the current profile picture stored is diferent from the one in the google account
+            if profile.profileImg != idinfo['picture']:
+                profile.profileImg = idinfo['picture']
+                profile.save()
+                
+
             profile_serializer = ProfileSerializer(profile)
             #print(serializer.data)
             user_pk = user.pk
@@ -186,6 +192,8 @@ def login_register_google(request):
 
             user = NewUser.objects.create(username=idinfo['given_name'], email=idinfo['email'])
             user.save()
+
+            print('picture: ', idinfo['picture'])
 
             user_model = NewUser.objects.get(username=idinfo['given_name'])
             new_profile = Profile.objects.create(user=user_model,profileImg=idinfo['picture'])

@@ -15,7 +15,7 @@ const PostScreen = (props) => {
   const navigation = useNavigation();
 
   //console.log('props', props)
-  const {username, postDescription, postImage, postTime, postID, profileImgURL} = props.route.params
+  const {username, postDescription, postImage, post_time, postID, profileImgURL} = props.route.params
 
   const [comment, setComment] = React.useState('')
   
@@ -77,7 +77,7 @@ const PostScreen = (props) => {
         <Image style={styles.profileImg} source={{uri:profileImgURL}}/>
         <View style={styles.username}>
           <Text style={styles.username}>{username}</Text>
-          <Text style={styles.postTime}>{postTime} Late</Text>
+          <Text style={styles.postTime}>{post_time} Late</Text>
         </View>
       </View>
       <View style={styles.image}>

@@ -83,7 +83,7 @@ const LoginScreen = ({navigation}) => {
       await AsyncStorageLib.setItem('email', user.email);
       await AsyncStorageLib.setItem('userProfilePicture', user.profileImg);
       login(user);
-      navigation.navigate('ProfileScreen');
+      navigation.navigate('HomeScreen');
     } catch (error) {
       console.log(error);
     }
@@ -115,7 +115,7 @@ const LoginScreen = ({navigation}) => {
               onPress={handleGoogleSignup} 
               style={styles.button}
             >
-              <Image source={require('../../assets/google_button.png')} style={{width: 300, height: 40}} />
+              <Image source={require('../../assets/google_button.png')} style={{width: 250, height: 40}} />
             </TouchableOpacity>
           </View>
         </>

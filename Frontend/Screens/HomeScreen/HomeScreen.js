@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-na
 import React from 'react'
 import PostShow from '../../Components/PostShow'
 import { useNavigation } from '@react-navigation/native'; 
+import AsyncStorageLib from "@react-native-async-storage/async-storage";
 
 /*function MakePostShow(props) {
   return(
@@ -32,13 +33,20 @@ function ShowPost(props) {
 const HomeScreen = () => {
 
   const navigation = useNavigation();
+  // get username from storage
 
+  const getIDFromStorage = async () => {
+    const id = await AsyncStorageLib.getItem("id");
+    return id;
+  };
 
   return (
     <SafeAreaView style ={styles.page}>
       <View style = {styles.header_container}>
         <Text style ={styles.text}>JeReal</Text>
-        <TouchableOpacity style={styles.profile_button} onPress={() => navigation.navigate('ProfileScreen', {})}>
+        <TouchableOpacity style={styles.profile_button} onPress={() => navigation.navigate('ProfileScreen', {
+          id: getIDFromStorage(),
+        })}>
           <Text style={styles.profile_button_text}>Profile</Text>
         </TouchableOpacity>
       </View>

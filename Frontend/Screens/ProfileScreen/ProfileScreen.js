@@ -17,18 +17,18 @@ const ProfileScreen = (props) => {
   
  // recebe o username do perfil que está a ser visitado através das props
   //const {username} = props.route.params;
-  const getIDFromStorage = async () => {
-    const idls = await AsyncStorageLib.getItem("id");
-    return idls;
+  
+  const getIDFromProps = async () => {
+    const {id} = props.route.params;
+    return id;
   };
   
-
   
   useEffect(() => {
-    getIDFromStorage().then((idls) => {
-      console.log('id', idls);
+    getIDFromProps().then((id) => {
+      console.log('id', id);
       axios
-        .get( SERVER_URL + '/profile/' + idls + '/')
+        .get( SERVER_URL + '/profile/' + id + '/')
         .then((response) => {
           //console.log(response.data)
           setPosts(response.data.posts)
@@ -156,15 +156,16 @@ const ProfileScreen = (props) => {
       <ScrollView>
         <View name='posts_container' style={styles.posts_container}>
           {posts.map((post) => (
+            console.log('creation time: ', post.creationTime),
             postTime = post.creationTime.slice(11,19),
-            //console.log('time: ', postTime),
-            <TouchableOpacity key={post.pk} style={styles.posts_container} onPress={() => {fetchPost(post.pk) , navigation.navigate('Post', {
+            console.log('time: ', postTime),
+            <TouchableOpacity key={post.pk} style={styles.posts_container} onPress={() => {fetchPost(post.pk) , navigation.navigate('PostScreen', {
               profileImgURL : profileImgURL,
               username: post.user,
               postID : post.pk, 
               postImage : post.image,
               postDescription : post.description,
-              postTime: postTime,
+              post_time: postTime,
             })}}>
               <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
             </TouchableOpacity>

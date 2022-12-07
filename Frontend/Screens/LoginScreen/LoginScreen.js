@@ -49,7 +49,7 @@ const LoginScreen = ({navigation}) => {
     const { id_token } = response.params;
     console.log("token", id_token);
     try {
-      const response = await fetch(SERVER_URL + '/login_register_google/', {
+      const response = await fetch('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/login_register_google/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

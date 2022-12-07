@@ -12,7 +12,6 @@ const ProfileScreen = (props) => {
   
   const [ posts, setPosts] = useState([])
   const [ profileInfo, setProfileInfo] = useState([])
-
   
   
  // recebe o username do perfil que está a ser visitado através das props
@@ -28,7 +27,7 @@ const ProfileScreen = (props) => {
     getIDFromProps().then((id) => {
       console.log('id', id);
       axios
-        .get( SERVER_URL + '/profile/' + id + '/')
+        .get('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/profile/' + id + '/')
         .then((response) => {
           //console.log(response.data)
           setPosts(response.data.posts)
@@ -51,7 +50,7 @@ const ProfileScreen = (props) => {
   
   // get all the info from the post
   const fetchPost = async (postID) => {
-    const response = await fetch(SERVER_URL + '/post/' + postID + '/', {
+    const response = await fetch('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/post/' + postID + '/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -157,15 +156,15 @@ const ProfileScreen = (props) => {
         <View name='posts_container' style={styles.posts_container}>
           {posts.map((post) => (
             console.log('creation time: ', post.creationTime),
-            postTime = post.creationTime.slice(11,19),
-            console.log('time: ', postTime),
+            
+            //console.log('time: ', postTime),
             <TouchableOpacity key={post.pk} style={styles.posts_container} onPress={() => {fetchPost(post.pk) , navigation.navigate('PostScreen', {
               profileImgURL : profileImgURL,
               username: post.user,
               postID : post.pk, 
               postImage : post.image,
               postDescription : post.description,
-              post_time: postTime,
+              post_time: post.creationTime.slice(11,19),
             })}}>
               <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
             </TouchableOpacity>

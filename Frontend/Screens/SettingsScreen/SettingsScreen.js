@@ -51,7 +51,7 @@ const SettingsScreen = (props) => {
 */
   handleSubmitSettings = async () => {
     try {
-      const response = await fetch(SERVER_URL + '/settings/' + state.user.username + '/', {
+      const response = await fetch('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/settings/' + state.user.username + '/', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

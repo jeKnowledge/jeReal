@@ -25,7 +25,7 @@ const PostScreen = (props) => {
   
   useEffect(() => {
     axios
-      .get(SERVER_URL + '/get_comments/' + postID +'/')
+      .get('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/get_comments/' + postID +'/')
       .then((response) => {
         //console.log(response.data)
         setCommentsList(response.data)
@@ -39,7 +39,7 @@ const PostScreen = (props) => {
 
   const fetchMakeComment = async () => {
     console.log('comment:', comment)
-    const response = await fetch(SERVER_URL + '/send_comment/', {
+    const response = await fetch('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/send_comment/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -155,7 +155,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   postImg:{
-    margin: 10,
+    //margin: 10,
+    padding: 15,
     width: 400,
     height: 350,
   },
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     resizeMode: 'contain',
     marginTop: 10,
-    marginLeft: 10,
+    marginRight: 10,
   },
   header:{
     height: 30,

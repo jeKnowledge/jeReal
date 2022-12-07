@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity , Image} from 'react-native'
 import React from 'react'
 import PostShow from '../../Components/PostShow'
 import { useNavigation } from '@react-navigation/native'; 
@@ -43,6 +43,9 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style ={styles.page}>
       <View style = {styles.header_container}>
+        <TouchableOpacity style={styles.profile_button} onPress={() => navigation.navigate('MakePostScreen')}>
+          <Image style={styles.cameraButton} source={require('../../assets/camera.png')}/>
+        </TouchableOpacity>
         <Text style ={styles.text}>JeReal</Text>
         <TouchableOpacity style={styles.profile_button} onPress={() => navigation.navigate('ProfileScreen', {
           id: getIDFromStorage(),
@@ -72,6 +75,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: 'black',
   },
+  cameraButton:{
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
   profile_button:{
     height: 30,
     width: 70,
@@ -89,9 +97,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     fontSize: 30,
-    textAlign: 'center',
+    selfAlign: 'center',
     marginBottom: 20,
-    paddingLeft: 150,
   },
   make_post:{
     alignItems: 'center',

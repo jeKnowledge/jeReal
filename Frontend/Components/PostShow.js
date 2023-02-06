@@ -2,32 +2,32 @@ import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react
 import React from 'react';
 import tw from "tailwind-react-native-classnames";
 
-const data = [
-{
-  id: "123",
-  author: "João",
-  image: "https://links.papareact.com/28w",
-  screen: "DetailScreen",
-  des: "Grande dia no espaço",
-},
-{
-  id: "124",
-  author: "Guilherme",
-  image: "https://links.papareact.com/28w",
-  screen: "DetailScreen",
-  des: "Grande dia na escola",
-},
-{
-  id: "125",
-  author: "Edu",
-  image: "https://links.papareact.com/28w",
-  screen: "DetailScreen",
-  des: "Grande dia na praia",
-},
-];
 
 const PostShow = () => {
 
+  // get all the info from the post
+  const fetchPost = async (postID) => {
+    const response = await fetch('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/post/' + postID + '/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if(!response){
+      return;
+    }
+    //console.log("response", response);
+
+    const data = await response.json();
+
+    if(response.status !== 200){
+      setError(true);
+      return;
+    }
+
+    console.log("data: ", data)
+    return data
+  }
   
 
   return (
@@ -35,15 +35,16 @@ const PostShow = () => {
     data={data}
     keyExtractor={(item) => item.id}
     renderItem={({ item }) => (
-        <TouchableOpacity style = {tw`pb-10`}>
-            <View>
-              <Text style ={tw`mt-1 text-white p-5 text-base font-semibold`}>{ item.author }</Text>
-              <Image
-              style={styles.post}
-              source={{ uri: item.image }}/>
-              <Text style ={tw`mt-1 text-white p-5 text-base font-semibold`}>{ item.des }</Text>
-            </View>
-        </TouchableOpacity>
+      <TouchableOpacity key={post.pk} style={styles.posts_container} onPress={() => {fetchPost(post.pk) , navigation.navigate('PostScreen', {
+        profileImgURL : profileImgURL,
+        username: post.user,
+        postID : post.pk, 
+        postImage : post.image,
+        postDescription : post.description,
+        post_time: post.creationTime.slice(11,19),
+      })}}>
+        <Image style={styles.postImg} source={require('../../assets/defaultImage.png')}/>
+      </TouchableOpacity>
     )}
     />
   );

@@ -6,6 +6,7 @@ import SettingsScreen from './SettingsScreen/SettingsScreen';
 import PostScreen from './PostScreen/PostScreen';
 import HomeScreen from './HomeScreen/HomeScreen';
 import MakePostScreen from './MakePostScreen/MakePostScreen';
+import MakePostDisc from './MakePostDisc/MakePostDisc';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -29,6 +30,7 @@ const Navigation = () => {
                 <Screen name="ProfileScreen" component={ProfileScreen} />
                 <Screen name="PostScreen" component={PostScreen} />
                 <Screen name="SettingsScreen" component={SettingsScreen} />
+                <Screen name="MakePostDisc" component={MakePostDisc}/>
               </>
             )}
         </Navigator>

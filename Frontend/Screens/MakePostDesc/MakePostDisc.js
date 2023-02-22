@@ -2,66 +2,62 @@ import { StyleSheet, Text, View, Image, SafeAreaView } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Camera } from 'expo-camera';
-import { shareAsync } from 'expo-sharing';
-import * as MediaLibrary from 'expo-media-library';
-import { useEffect, useRef, useState } from 'react';
 
 
 
-const MakePostScreen = () => {
+
+const MakePostDisc = () => {
   
   const navigation = useNavigation();
 
-  let cameraRef = useRef();
-  const [hasCameraPermission, setHasCameraPermission] = useState();
-  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
-  const [photo, setPhoto] = useState();
+  const fetchMakePost = async () => {
+    console.log('post:', post)
+    const response = await fetch('https://c271-2a01-11-320-18a0-2c7d-fdcb-def2-60d6.eu.ngrok.io/send_post/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        "user": user, 
+        "image": image,
+        "description": description,
+        "creationTime": creationTime,
+        "lateTime": lateTime,
+      })
+    })
+    console.log(JSON.stringify({
+        "user": user, 
+        "image": image,
+        "description": description,
+        "creationTime": creationTime,
+        "lateTime": lateTime,
+      }))
+    const data = await response.json()
+    console.log(data)
 
-
-  useEffect(() => {
-    (async () => {
-      const cameraPermission = await Camera.requestCameraPermissionsAsync();
-      const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
-      setHasCameraPermission(cameraPermission.status === "granted");
-      setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
-    })();
-  }, []);
-
-  if (hasCameraPermission === undefined) {
-    return <Text>Requesting permissions...</Text>
-  }else if (!hasCameraPermission) {
-    return <Text>Permission for camera not granted. Please change this in settings.</Text>
   }
-
-  let takePic = async () => {
-    let options = {
-      quality: 1,
-      base64: true,
-      exif: false,
-    };
-
-    let newPhoto = await cameraRef.current.takePictureAsync(options);
-    setPhoto(newPhoto);
-  };
-
-  if(photo) {
-    let postPic = () => {
-      shareAsync(photo.uri).then(() => navigation.navigate('MakePostDisc', {}));
-    };
+  
 
     return (
       <SafeAreaView style={styles.page}>
 
         <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64 }}/>
 
+        <View style={styles.body}>
+            <Text style={styles.descriptionText}>Description</Text>
+            <TextInput style={styles.description}
+            placeholder={Description}
+             onChangeText={newDescription => setDescription(newDescription)}
+            defaultValue={description}/>
+        </View>
+
         <View style={styles.preview_buttons_container}>
 
-          <TouchableOpacity onPress={() => setPhoto(undefined)}>
-            <Image style={styles.discard_button} source={require('../../assets/discard.png')}/>
+          <TouchableOpacity onPress={() => navigation.navigate('MakePostScreen')}>
+            <Image style={styles.discard_button} source={require('../../assets/back_arrow.png')}/>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={postPic}>
+          <TouchableOpacity onPress={fetchMakePost}>
             <Text style={styles.post_button}>POST</Text>
           </TouchableOpacity>
 
@@ -73,21 +69,7 @@ const MakePostScreen = () => {
   }
 
 
-
-
-  return (
-    <SafeAreaView style={styles.page}>
-      <Camera style={styles.camera} ref={cameraRef}/>
-      <View style={styles.button_container}>
-        <TouchableOpacity onPress={takePic}>
-          <Image style={styles.pic_button} source={require('../../assets/camera.png')}/>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  )
-}
-
-export default MakePostScreen
+export default MakePostDisc
 
 const styles = StyleSheet.create({
   page:{

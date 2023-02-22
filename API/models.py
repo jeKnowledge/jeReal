@@ -23,7 +23,7 @@ class Profile(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(NewUser, to_field="username", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='postImg')
+    image = models.ImageField(upload_to='postImg', blank = True, null = True )
     description = models.TextField(max_length = 500, blank = True)
     creationTime = models.DateTimeField(default=timezone.now)
     lateTime = models.IntegerField(default=0)
